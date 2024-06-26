@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Form from "./Form";
 import Todos from "./Todos";
 import Edit from "./Edit";
+import TodoDone from "./TodoDone";
 
 const TodoList = () => {
   const [todoVal, setTodo] = useState([]);
@@ -34,22 +35,34 @@ const TodoList = () => {
   };
 
   const checkTodo = (id) => {
-    todoVal.map((todo) =>
-      todo.id === id ? { ...todo, isDone: !todo.isDone } : todo
-    );
+    const updatedTodos = todoVal.map((todo) => {
+      if (todo.id === id) {
+        if (!todo.isDone) {
+          const sfx = new Audio("/sounds/ding.mp3");
+          sfx.play();
+        }
+        return { ...todo, isDone: !todo.isDone };
+      }
+      return todo;
+    });
+
+    setTodo(updatedTodos);
   };
+
+  const activeTodos = todoVal.filter((todo) => !todo.isDone);
+  const doneTodos = todoVal.filter((todo) => todo.isDone);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-300 pt-7 font-primary mb-7">
-        Todo List App
+      <h1 className="pt-3 text-4xl font-bold text-gray-300 font-primary mb-7">
+        Todo List
       </h1>
 
       <Form createTodo={createTodo} />
 
       {todoVal.length > 0 ? (
-        <div className="container mt-10 w-[400px] p-3 flex items-center flex-col bg-slate-400 max-h-[62vh] overflow-y-scroll no-scrollbar">
-          {todoVal.map((todo, idx) =>
+        <div className="container mt-10 w-[400px] p-3 flex items-center flex-col bg-slate-400 max-h-[62vh] overflow-y-scroll thin-scrollbar no-scrollbar-x">
+          {activeTodos.map((todo, idx) =>
             todo.isEditing ? (
               <Edit key={idx} editTask={editTask} task={todo} />
             ) : (
@@ -62,9 +75,24 @@ const TodoList = () => {
               />
             )
           )}
-          <footer className="bottom-0 mt-2 text-slate-600">
-            Designed and built by Hapis
-          </footer>
+          {doneTodos.length > 0 && (
+            <h2 className="mt-2 mb-1 text-lg font-semibold w-[100%] text-left">
+              Done
+            </h2>
+          )}
+          {doneTodos.map((todo, idx) =>
+            todo.isEditing ? (
+              <Edit key={idx} editTask={editTask} task={todo} />
+            ) : (
+              <TodoDone
+                task={todo}
+                key={idx}
+                checkTodo={checkTodo}
+                deleteTodo={deleteTodo}
+                editTodo={editTodo}
+              />
+            )
+          )}
         </div>
       ) : (
         <p className="text-gray-500">No task available</p>
