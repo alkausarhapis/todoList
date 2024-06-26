@@ -1,4 +1,4 @@
-# ToDo List (https://react-tailwind-todo-app.netlify.app/)
+# ToDo List (https://todolistriect.netlify.app/)
 
 References :
 
